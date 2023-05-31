@@ -1,20 +1,15 @@
 # DoS_attack
 
-## How to run 
+## How to run
 
-1. Active the virtual enviroment, running:
+1. Active the virtual environment, running:
 
-    ```
-    source ./.venv/bin/activate
-    ```
+   ```
+   source ./.venv/bin/activate
+   ```
 
-2. Install ptoject dependencies:
+2. Install project dependencies:
 
-    ```
-    pip install -r requirements.txt
-    ```
-
-
-## Sentry
-
-Url: https://just-for-test-me.sentry.io/performance/
+   ```
+   pip install -r requirements.txt
+   ```
