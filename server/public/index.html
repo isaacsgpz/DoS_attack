@@ -89,9 +89,10 @@
         margin-top: 1rem;
       }
 
-      .input-wrapper {
+      .flex-wrapper {
         display: flex;
-        gap: 0.5rem;
+        align-items: center;
+        gap: 1rem;
       }
 
       .input {
@@ -126,7 +127,7 @@
         cursor: not-allowed;
       }
 
-      .button:hover {
+      .button:not(:disabled):hover {
         background-color: var(--pink-color);
       }
 
@@ -156,7 +157,7 @@
         <h1 class="heading">Fibonacci calculator</h1>
 
         <form>
-          <div class="input-wrapper">
+          <div class="flex-wrapper">
             <label>
               <input
                 type="number"
@@ -174,9 +175,17 @@
         </form>
 
         <div class="result">
-          <span data-js="number" class="number"></span>
+          <div class="flex-wrapper">
+            <span data-js="number" class="number"></span>
+          </div>
+
           <strong data-js="fib" class="heading"></strong>
           <div class="loading hidden" data-js="loading"></div>
+
+          <div class="flex-wrapper">
+            <span data-js="server-time" class="number"></span>
+            <span data-js="client-time" class="number"></span>
+          </div>
         </div>
       </article>
     </div>
@@ -184,6 +193,8 @@
     <script>
       const form = document.querySelector("form");
       const numberEl = document.querySelector('[data-js="number"]');
+      const serverTimeEl = document.querySelector('[data-js="server-time"]');
+      const clientTimeEl = document.querySelector('[data-js="client-time"]');
       const fibEl = document.querySelector('[data-js="fib"]');
       const loadingEl = document.querySelector('[data-js="loading"]');
       const buttonEl = document.querySelector('[data-js="button"]');
@@ -210,20 +221,23 @@
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const start = performance.now();
         const num = Number(form.number.value);
 
         if (isNaN(num)) {
-          console.log("Please enter a valid number");
           return;
         }
 
-        const { number, fib } = await getFibonacci(num);
+        const { number, fib, time } = await getFibonacci(num);
+        const elapsed = performance.now() - start;
 
-        if (number && fib) {
+        console.log(elapsed.toFixed(3));
+        if (number && fib && time) {
           numberEl.innerText = number;
           fibEl.innerText = fib;
+          serverTimeEl.innerText = `server: ${time.toFixed(3)}ms`;
+          clientTimeEl.innerText = `client: ${elapsed.toFixed(3)}ms`;
 
-          console.log(number, fib);
           form.reset();
         }
       });
