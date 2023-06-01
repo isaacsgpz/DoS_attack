@@ -18,13 +18,12 @@ class Client(Thread):
         while True:
             try:
                 response = get(
-                    f"http://{self.host}:{self.port}/fib",
-                    params={"number": num},
+                    f"http://{self.host}:{self.port}/fib/{num}",
                     timeout=None,
                 )
                 if response.status_code == 200:
                     print(response.text)
-                    num += 1
+                num += 1
             except (exceptions.RequestException, Exception):
                 pass
 

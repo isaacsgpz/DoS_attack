@@ -2,88 +2,75 @@ import json
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from time import sleep
-from typing import Callable
-from urllib.parse import parse_qs, urlparse
-
 from termcolor import colored
 
 
 class FibonacciRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        self._routes = {
-            "/": self._handle_home,
-            "/fib": self._handle_fib,
-        }
+        self.root_dir = os.path.dirname(os.path.abspath(__file__))
+        self.status = 200
 
         super().__init__(*args, **kwargs)
 
     def do_GET(self):
         try:
-            self.parsed_url = urlparse(self.path)
-            query_params = parse_qs(self.parsed_url.query)
-            params = {key: query_params.get(key, [None])[0] for key in query_params}
-
-            if self.path.split("?")[0] in self._routes:
-                handler_method: Callable = self._routes[self.path.split("?")[0]]
-                handler_method(**params)
+            if self.path == "/":
+                self._handle_home()
+            elif self.path.startswith("/fib"):
+                self._handle_fib(self.path.split("/")[2])
             else:
-                self._send_response_headers(404)
-                return
+                return self._send_response(404)
         except Exception:
-            self._send_response_headers(500)
-            return
+            return self._send_response(500)
         finally:
             sleep(0.1)
 
     def log_message(self, format, *args):
-        pass
-
-    def _print_request_info(self, endpoint: str, status: int):
-        print_color = "red" if status >= 400 else "green"
-        url = f"http://localhost{self.path}" or f"http://localhost{endpoint}"
+        color = "red" if self.status >= 400 else "green"
+        host = self.headers.get("Host", "localhost")
         print(
-            f'{colored(self.command, print_color, attrs=["bold"])}/{colored(status, print_color, attrs=["bold"])} => {colored(url, "white")}'
+            f'{colored(self.command, color, attrs=["bold"])}/'
+            f'{colored(self.status, color, attrs=["bold"])} => '
+            f'{colored(f"http://{host}{self.path}", "white")}'
         )
 
-    def _send_response_headers(
-        self, status: int, content_type: str = "application/json"
-    ):
-        self._print_request_info(self.parsed_url.path, status)
+    def _send_response(self, status: int, content_type: str = "application/json"):
+        self.status = status
+        if status >= 400:
+            return self.send_error(status)
+
         self.send_response(status)
         self.send_header("Content-type", content_type)
         self.end_headers()
 
-    # Route handlers ==============================================
-    def _handle_home(self, **params):
-        html_file_path = os.path.join(self.current_dir, "public", "index.html")
-        self._send_response_headers(200, "text/html")
+    def _handle_home(self):
+        html = os.path.join(self.root_dir, "public", "index.html")
+        self._send_response(200, "text/html")
 
-        with open(html_file_path, "r") as file:
+        with open(html, "r") as file:
             html_content = file.read()
         self.wfile.write(html_content.encode())
 
-    def _handle_fib(self, **params):
-        number_str = params.get("number", "0")
+    def _handle_fib(self, number_str: str):
         try:
             number = int(number_str)
         except ValueError:
-            self._send_response_headers(400)
-            return
+            return self._send_response(400)
 
         response = {
             "number": number,
             "fib": self._calculate_fibonacci(number),
         }
 
-        self._send_response_headers(200)
+        self._send_response(200)
         self.wfile.write(json.dumps(response).encode())
+        return
 
     def _calculate_fibonacci(self, n: int):
-        a, b = 0, 1
+        x, y = 0, 1
         for _ in range(n):
-            a, b = b, a + b
-        return a
+            x, y = y, x + y
+        return x
 
 
 class FibonacciServer:
@@ -91,8 +78,6 @@ class FibonacciServer:
         self.host = host
         self.port = port
         self.server: HTTPServer = None
-
-    print(os.curdir)
 
     def start(self):
         print(colored(f"Server started at http://{self.host}:{self.port}", "yellow"))
