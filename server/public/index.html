@@ -12,10 +12,25 @@
       rel="stylesheet"
     />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Fibonacci</title>
+    <title>Fibonacci Calculator</title>
   </head>
   <body>
     <style>
+      :root {
+        --background-color: #282a36;
+        --shape-color: #30323d;
+        --current-line-color: #44475a;
+        --foreground-color: #f8f8f2;
+        --comment-color: #6272a4;
+        --cyan-color: #8be9fd;
+        --green-color: #50fa7b;
+        --orange-color: #ffb86c;
+        --pink-color: #ff79c6;
+        --purple-color: #bd93f9;
+        --red-color: #ff5555;
+        --yellow-color: #f1fa8c;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -25,7 +40,18 @@
       body {
         font-family: "Ubuntu", sans-serif;
         font-size: 1rem;
-        color: #333;
+        color: var(--foreground-color);
+        background-color: var(--background-color);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .heading {
+        color: var(--green-color);
+        text-align: center;
+        font-size: 2.5rem;
       }
 
       #root {
@@ -43,7 +69,6 @@
         align-items: center;
         justify-content: center;
         gap: 1rem;
-        padding: 1rem;
         border-radius: 0.5rem;
       }
 
@@ -53,28 +78,105 @@
         align-items: center;
         gap: 0.5rem;
       }
+
+      .number {
+        font-size: 1.2rem;
+        color: var(--current-line-color);
+      }
+
+      .loading {
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      .input-wrapper {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .input {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--current-line-color);
+        background-color: var(--shape-color);
+        color: var(--foreground-color);
+        font-size: 1rem;
+      }
+
+      .input::-webkit-outer-spin-button,
+      .input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .button {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--current-line-color);
+        background-color: var(--purple-color);
+        color: var(--foreground-color);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .button:hover {
+        background-color: var(--pink-color);
+      }
+
+      .loading::after {
+        content: "";
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 99999px;
+        border-top: 3px solid transparent;
+        border-top-color: var(--green-color);
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     </style>
 
     <div id="root">
       <article class="card">
-        <h1>Fibonacci calculator</h1>
+        <h1 class="heading">Fibonacci calculator</h1>
 
         <form>
-          <label>
-            <input
-              type="number"
-              name="number"
-              id="number"
-              placeholder="Enter a number"
-            />
-          </label>
-
-          <button type="submit">Submit</button>
+          <div class="input-wrapper">
+            <label>
+              <input
+                type="number"
+                name="number"
+                id="number"
+                class="input"
+                min="0"
+                placeholder="Enter a number"
+              />
+            </label>
+            <button type="submit" data-js="button" class="button">
+              Submit
+            </button>
+          </div>
         </form>
 
         <div class="result">
-          <span data-js="number"></span>
-          <strong data-js="fib"></strong>
+          <span data-js="number" class="number"></span>
+          <strong data-js="fib" class="heading"></strong>
+          <div class="loading hidden" data-js="loading"></div>
         </div>
       </article>
     </div>
@@ -83,12 +185,27 @@
       const form = document.querySelector("form");
       const numberEl = document.querySelector('[data-js="number"]');
       const fibEl = document.querySelector('[data-js="fib"]');
+      const loadingEl = document.querySelector('[data-js="loading"]');
+      const buttonEl = document.querySelector('[data-js="button"]');
+
+      const toggleLoadingIndicator = () => {
+        loadingEl.classList.toggle("hidden");
+        fibEl.classList.toggle("hidden");
+        buttonEl.disabled = !buttonEl.disabled;
+      };
 
       const getFibonacci = async (number) => {
-        const response = await fetch(
-          `http://localhost:8000/fib?number=${number}`
-        );
-        return await response.json();
+        toggleLoadingIndicator();
+
+        try {
+          const response = await fetch(`http://localhost:8000/fib/${number}`);
+          const data = await response.json();
+          toggleLoadingIndicator();
+          return data;
+        } catch (error) {
+          console.error("An error occurred:", error);
+          return;
+        }
       };
 
       form.addEventListener("submit", async (e) => {
