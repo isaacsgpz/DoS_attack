@@ -13,5 +13,8 @@ def run_server():
         server.stop()
         print(colored("Exiting...", "yellow"))
 
+
 if __name__ == "__main__":
     run_server()
+
+# python3 server/fibonacci_server.py
