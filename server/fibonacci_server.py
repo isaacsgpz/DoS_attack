@@ -1,66 +1,82 @@
 import json
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Callable
-from urllib.parse import urlparse, parse_qs
 from time import sleep
+from typing import Callable
+from urllib.parse import parse_qs, urlparse
 
-class FibonacciServer(BaseHTTPRequestHandler):
+from termcolor import colored
+
+
+class FibonacciRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self._routes = {
-            '/': self.handle_home,
-            '/fib': self.handle_fib,
+            "/": self._handle_home,
+            "/fib": self._handle_fib,
         }
+
         super().__init__(*args, **kwargs)
 
     def do_GET(self):
         try:
-            parsed_url = urlparse(self.path)
-            query_params = parse_qs(parsed_url.query)
+            self.parsed_url = urlparse(self.path)
+            query_params = parse_qs(self.parsed_url.query)
             params = {key: query_params.get(key, [None])[0] for key in query_params}
 
-            if self.path.split('?')[0] in self._routes:
-                handler_method: Callable = self._routes[self.path.split('?')[0]]
+            if self.path.split("?")[0] in self._routes:
+                handler_method: Callable = self._routes[self.path.split("?")[0]]
                 handler_method(**params)
             else:
-                self.send_response(404)
-                self.end_headers()
-        except Exception as e:
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(str(e).encode())
+                self._send_response_headers(404)
+                return
+        except Exception:
+            self._send_response_headers(500)
+            return
+        finally:
+            sleep(0.1)
 
-    def handle_home(self, **params):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+    def log_message(self, format, *args):
+        pass
+
+    def _print_request_info(self, endpoint: str, status: int):
+        print_color = "red" if status >= 400 else "green"
+        url = f"http://localhost{self.path}" or f"http://localhost{endpoint}"
+        print(
+            f'{colored(self.command, print_color, attrs=["bold"])}/{colored(status, print_color, attrs=["bold"])} => {colored(url, "white")}'
+        )
+
+    def _send_response_headers(
+        self, status: int, content_type: str = "application/json"
+    ):
+        self._print_request_info(self.parsed_url.path, status)
+        self.send_response(status)
+        self.send_header("Content-type", content_type)
         self.end_headers()
-        self.wfile.write(b'Hello, World!')
 
-    def handle_fib(self, **params):
-        number_str = params.get('number', '0')
+    # Route handlers ==============================================
+    def _handle_home(self, **params):
+        html_file_path = os.path.join(self.current_dir, "public", "index.html")
+        self._send_response_headers(200, "text/html")
 
+        with open(html_file_path, "r") as file:
+            html_content = file.read()
+        self.wfile.write(html_content.encode())
+
+    def _handle_fib(self, **params):
+        number_str = params.get("number", "0")
         try:
             number = int(number_str)
         except ValueError:
-            self.send_response(400)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            error_response = {
-                'error': 'Invalid parameter',
-                'message': f'Invalid value for parameter "number": {number_str}',
-            }
-            self.wfile.write(json.dumps(error_response).encode())
+            self._send_response_headers(400)
             return
 
         response = {
-            'number': number,
-            'fib': self._calculate_fibonacci(number),
+            "number": number,
+            "fib": self._calculate_fibonacci(number),
         }
 
-        sleep(0.1)
-
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
+        self._send_response_headers(200)
         self.wfile.write(json.dumps(response).encode())
 
     def _calculate_fibonacci(self, n: int):
@@ -70,11 +86,21 @@ class FibonacciServer(BaseHTTPRequestHandler):
         return a
 
 
-def run_server():
-    server_address = ('localhost', 8000)
-    httpd = HTTPServer(server_address, FibonacciServer)
-    httpd.serve_forever()
+class FibonacciServer:
+    def __init__(self, host="localhost", port=8000):
+        self.host = host
+        self.port = port
+        self.server: HTTPServer = None
 
+    print(os.curdir)
 
-if __name__ == '__main__':
-    run_server()
+    def start(self):
+        print(colored(f"Server started at http://{self.host}:{self.port}", "yellow"))
+        self.server = HTTPServer((self.host, self.port), FibonacciRequestHandler)
+        self.server.serve_forever()
+
+    def stop(self):
+        if self.server:
+            self.server.shutdown()
+            self.server.server_close()
+            print(colored("\nServer stopped", "yellow"))
