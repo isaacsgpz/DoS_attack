@@ -1,5 +1,7 @@
 .venv/
 __pycache__/
 
-server/resolution.py
-client/resolution.py
+resolution.py
+
+passwords.txt
+users.txt

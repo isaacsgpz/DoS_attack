@@ -6,7 +6,7 @@ HOST = "localhost"
 PORT = 8000
 
 
-class Client(Thread):
+class Attack(Thread):
     def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
@@ -36,7 +36,7 @@ class DoS:
     def start(self, num_threads=10):
         print("Starting threads...")
         for _ in range(num_threads):
-            thread = Client(self.host, self.port)
+            thread = Attack(self.host, self.port)
             thread.start()
 
 

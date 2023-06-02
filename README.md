@@ -35,7 +35,7 @@ python3 server/fibonacci_server.py
 Run the DoS attack by executing the following command:
 
 ```bash
-python3 client/main.py
+python3 attack/main.py
 ```
 
 ## API Reference
@@ -73,7 +73,7 @@ The objective is to defend the server against a DoS attack. To do so, implement 
 The objective is to attack the server by converting the DoS attack into a Distributed Denial of Service (DDoS) attack:
 
 - Create an SSH botnet.
-- Upon connecting to the target, [download the file](https://raw.githubusercontent.com/eoisaac/DoS_attack/main/client/main.py) and execute it.
+- Upon connecting to the target, [download the file](https://raw.githubusercontent.com/eoisaac/DoS_attack/main/attack/main.py) and execute it.
 
 ## Exercício Prático
 
@@ -88,7 +88,7 @@ O objetivo é defender o servidor do ataque DoS, para isso implemente melhorias 
 O objetivo é atacar o servidor, para isso converta o DoS em um ataque DDoS:
 
 - Crie uma simples botnet SSH
-- Ao conectar ao alvo, faça [download do arquivo](https://raw.githubusercontent.com/eoisaac/DoS_attack/main/client/main.py) e o execute.
+- Ao conectar ao alvo, faça [download do arquivo](https://raw.githubusercontent.com/eoisaac/DoS_attack/main/attack/main.py) e o execute.
 
 ## Author
 
