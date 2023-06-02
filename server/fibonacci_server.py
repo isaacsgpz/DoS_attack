@@ -1,9 +1,10 @@
 import json
 import os
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from time import sleep
+
 from termcolor import colored
-from datetime import datetime
 
 
 class FibonacciRequestHandler(BaseHTTPRequestHandler):

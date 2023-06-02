@@ -73,7 +73,7 @@ The objective is to defend the server against a DoS attack. To do so, implement 
 The objective is to attack the server by converting the DoS attack into a Distributed Denial of Service (DDoS) attack:
 
 - Create an SSH botnet.
-- Upon connecting to the target, download the file and execute it.
+- Upon connecting to the target, [download the file](https://raw.githubusercontent.com/eoisaac/DoS_attack/main/client/main.py) and execute it.
 
 ## Exercício Prático
 
