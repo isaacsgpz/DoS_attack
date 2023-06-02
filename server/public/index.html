@@ -231,7 +231,6 @@
         const { number, fib, time } = await getFibonacci(num);
         const elapsed = performance.now() - start;
 
-        console.log(elapsed.toFixed(3));
         if (number && fib && time) {
           numberEl.innerText = number;
           fibEl.innerText = fib;
