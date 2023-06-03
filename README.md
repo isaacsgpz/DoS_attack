@@ -9,7 +9,7 @@ This project provides a simulation of a Denial of Service (DoS) attack for educa
 [Optional] Create a virtual environment to isolate project dependencies. Skip this step if you prefer to install the project dependencies globally.
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 ```
 
 [Optional] Active the virtual environment, running:
@@ -29,7 +29,7 @@ pip install -r requirements.txt
 Start the server by running the following command:
 
 ```bash
-python3 server/fibonacci_server.py
+python3 server/main.py
 ```
 
 Run the DoS attack by executing the following command:
