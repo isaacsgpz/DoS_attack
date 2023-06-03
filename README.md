@@ -4,6 +4,8 @@
 
 This project provides a simulation of a Denial of Service (DoS) attack for educational purposes in information security classes. It demonstrates how such attacks can disrupt the availability of a target system by overwhelming its resources.
 
+You can access the slides in the following [link](https://docs.google.com/presentation/d/1O_LsmGRh4DroH3Tq830xtmxml6-76d7YTPXxOUDyXX4/edit?usp=sharing).
+
 ## Installation
 
 [Optional] Create a virtual environment to isolate project dependencies. Skip this step if you prefer to install the project dependencies globally.
@@ -48,16 +50,16 @@ python3 attack/main.py
 GET /fib/${number}
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `number`  | `number` | **Required**. The input number to calculate the Fibonacci sequence for.       |
+| Parameter | Type     | Description                                                             |
+| :-------- | :------- | :---------------------------------------------------------------------- |
+| `number`  | `number` | **Required**. The input number to calculate the Fibonacci sequence for. |
 
 #### Response
 
-| Property | Type     | Description                                 |
-| :------- | :------- | :------------------------------------------ |
-| `number` | `number` | The input number for which Fibonacci sequence was calculated. |
-| `fib`    | `number` | The calculated Fibonacci sequence value.      |
+| Property | Type     | Description                                                         |
+| :------- | :------- | :------------------------------------------------------------------ |
+| `number` | `number` | The input number for which Fibonacci sequence was calculated.       |
+| `fib`    | `number` | The calculated Fibonacci sequence value.                            |
 | `time`   | `number` | The time taken to calculate the Fibonacci sequence in milliseconds. |
 
 ## Hands-On
@@ -81,7 +83,7 @@ Você deverá escolher entre o time **Azul(defesa)** ou **Vermelho(ataque)** e d
 
 **Azul Team**
 
-O objetivo é defender o servidor do ataque DoS, para isso implemente melhorias para previnir o ataque.
+O objetivo é defender o servidor do ataque DoS, para isso implemente melhorias para prevenir o ataque.
 
 **Vermelho Team**
 

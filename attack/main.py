@@ -2,9 +2,6 @@ from threading import Thread
 
 from requests import exceptions, get
 
-HOST = "localhost"
-PORT = 8000
-
 
 class Attack(Thread):
     def __init__(self, host: str, port: int):
@@ -40,8 +37,16 @@ class DoS:
             thread.start()
 
 
-if __name__ == "__main__":
+HOST = "localhost"
+PORT = 8000
+
+
+def run_dos():
     dos = DoS(HOST, PORT)
     dos.start()
+
+
+if __name__ == "__main__":
+    run_dos()
 
 # python3 client/main.py
